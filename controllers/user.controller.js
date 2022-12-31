@@ -1,4 +1,4 @@
-const User = require("../models/user.schema");
+const Customer = require("../models/customer");
 const customError = require("../utils/custom.error")
 const cookieOptions = require("../utils/cookie.options")
 const AuthRoles = require("../utils/auth.roles")
@@ -11,7 +11,7 @@ exports.createUser = async (req, res) => {
         if(!name || !email || !password){
             throw new customError("Enter All your Details", 401);
         }
-        const userExist = await User.findOne({email})
+        const userExist = await Customer.findOne({email})
 
         if(userExist){
             throw new customError("Email Already Exist", 401);
@@ -32,7 +32,7 @@ exports.createUser = async (req, res) => {
                 password
             }
         }
-        const user = await User.create(details);
+        const user = await Customer.create(details);
         const token  = await user.getJwtToken();
         console.log(user);
         user.password = undefined;
@@ -44,6 +44,7 @@ exports.createUser = async (req, res) => {
             user
         })
     } catch (error) {
+        console.log(error);
         throw new customError("Something Went Wrong", 401);
     }
 }
@@ -55,7 +56,7 @@ exports.login = async (req, res) => {
         if(!email || !password){
             throw new customError("Provide all details", 401)
         }
-        const userExist = await User.findOne({email})
+        const userExist = await Customer.findOne({email})
         if(!userExist){
             throw new customError("User does not Exist", 401);
         }
@@ -78,6 +79,7 @@ exports.login = async (req, res) => {
             userExist
         })
     } catch (error) {
+        console.log(error);
         throw new customError("Something Went Wrong", 401);
     }
 }

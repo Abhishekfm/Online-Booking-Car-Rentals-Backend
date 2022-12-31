@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs")
 const JWT = require("jsonwebtoken")
 const AuthRoles = require("../utils/auth.roles")
 
-const userSchema = mongoose.Schema(
+const customerSchema = mongoose.Schema(
     {
         name:{
             type:String,
@@ -28,7 +28,7 @@ const userSchema = mongoose.Schema(
     }
 )
 
-userSchema.pre("save", async function(next){
+customerSchema.pre("save", async function(next){
     if(!this.isModified){
         return next()
     }
@@ -36,13 +36,13 @@ userSchema.pre("save", async function(next){
     return next()
 })
 
-userSchema.methods = {
+customerSchema.methods = {
     getJwtToken:function (){
         return JWT.sign(
             {
                 _id:this._id
             },
-            yoursecret,
+            process.env.JWT_SECRET,
             {
                 expiresIn:"7d"
             }
@@ -53,4 +53,4 @@ userSchema.methods = {
     }
 }
 
-module.exports = mongoose.model("User", userSchema)
+module.exports = mongoose.model("Customer", customerSchema)
