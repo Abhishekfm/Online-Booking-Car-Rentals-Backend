@@ -120,6 +120,7 @@ exports.getDashboard = (req, res) => {
             success: true,
             name: user.name,
             email: user.email,
+            role: user.role,
             ID:  user._id
         })
     } catch (error) {
