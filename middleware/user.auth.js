@@ -7,7 +7,7 @@ exports.isLoggedIn = async (req, res, next) => {
     if(req.cookies.token || (req.headers.authorization && req.headers.authorization.startsWith("Bearer"))){
         token = req.cookies.token || req.headers.authorization.split(" ")[1]
     }
-    console.log(token);
+    // console.log(token);
     if(!token){
         throw new customError("Token is not Present",401)
     }

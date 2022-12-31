@@ -6,13 +6,12 @@ exports.createCar = async (req, res) => {
     try {
         const { user } = req
         const { carName, carLocation, numberOfCars } = req.body
-
-        if(!carName || !carLocation || !numberOfCars || numberOfCars > 0){
+        if(!carName || !carLocation || !numberOfCars || numberOfCars < 0){
             throw new customError("Provide all Details")
         }
 
-        const carExist = await Car.find({carName,carLocation})
-
+        const carExist = await Car.findOne({'carName':`${carName}`, 'carLocation.country':`${carLocation.country}`,'carLocation.state':`${carLocation.state}`,'carLocation.city':`${carLocation.city}`})
+        console.log(carExist+"lplpl");
         if(carExist){
             carExist.numberOfCars += numberOfCars
             await carExist.save()
@@ -20,6 +19,7 @@ exports.createCar = async (req, res) => {
                 success:true,
                 carExist
             })
+            return
         }
         const car = await Car.create({
             carName,
@@ -31,7 +31,9 @@ exports.createCar = async (req, res) => {
             car:car
         })
     } catch (error) {
-        
+        console.log(error);
+        throw new customError("something went wrong", 402)
     }
 
 }
+

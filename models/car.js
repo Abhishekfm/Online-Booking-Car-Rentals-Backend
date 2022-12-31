@@ -17,8 +17,7 @@ const carSchema = mongoose.Schema(
             city:{
                 type:String,
                 require:[true, "Location is required"]
-            },
-            unique:true
+            }
         },
         numberOfCars:{
             type:Number,
