@@ -1,4 +1,5 @@
 const Car = require("../models/car")
+const Order = require("../models/order")
 const customError = require("../utils/custom.error")
 
 
@@ -30,36 +31,35 @@ exports.getAllCar = async (req, res) => {
 }
 
 
-exports.bookCars = async (req, res) => {
+exports.bookCar = async (req, res) => {
     try {
-        const { data } = req.body //Data is a array of object
-
-        // Left With update in order Database
-        if(!data){
-            throw new customError("No car for order", 401)
+        const { carId, userId, startDate, endDate}= req.body
+        if(!carId || !startDate || !endDate){
+            throw new customError("Provide all details", 401)
         }
-
-        const changeData = []
-        const availableCars = true
-
-        await data.forEach(async element => {
-            const car = await Car.findOne({_id:element._id})
-            if(!car){
-                throw new customError("This car is not available", 401)
+        const carExist = await Car.findById(carId);
+        if(!carExist || carExist.numberOfCars < 1){
+            throw new customError("OUT OF STOCK", 401)
+        }
+        carExist.numberOfCars -= 1;
+        await carExist.save()
+        const createOrder = await Order.create({
+            carName: carExist.carName,
+            carId: carExist._id,
+            userId: userId,
+            orderDate:{
+                startDate:startDate,
+                endDate:endDate
             }
-            if(car.numberOfCars >= element.numberOfCars){
-                car.numberOfCars -= element.numberOfCars
-                changeData.push(car)
-                await car.save()
-                // console.log(car);
-            }
-        });
+
+        })
         res.status(200).json({
             success:true,
-            cars:data
+            createOrder
         })
-        return
+
     } catch (error) {
+        console.log(error);
         throw new customError("Something Went Wrong",401)
     }
 }
