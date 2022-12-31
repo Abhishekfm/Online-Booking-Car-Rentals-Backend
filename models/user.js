@@ -1,4 +1,7 @@
 const mongoose = require("mongoose")
+const bcrypt = require("bcryptjs")
+const JWT = require("jsonwebtoken")
+const AuthRoles = require("../utils/auth.roles")
 
 const userSchema = mongoose.Schema(
     {
@@ -12,6 +15,11 @@ const userSchema = mongoose.Schema(
             require:[true,"Email is required"],
             unique:true
         },
+        role: {
+            type: String,
+            enum: Object.values(AuthRoles),
+            default: AuthRoles.USER
+        },
         password:{
             type:String,
             require:[true,"Password is required"],
@@ -19,5 +27,30 @@ const userSchema = mongoose.Schema(
         }
     }
 )
+
+userSchema.pre("save", async function(next){
+    if(!this.isModified){
+        return next()
+    }
+    this.password = await bcrypt.hash(this.password, 10);
+    return next()
+})
+
+userSchema.methods = {
+    getJwtToken:function (){
+        return JWT.sign(
+            {
+                _id:this._id
+            },
+            yoursecret,
+            {
+                expiresIn:"7d"
+            }
+        )
+    },
+    comparePassword: async function(enteredPassword){
+        return await bcrypt.compare(enteredPassword, this.password)
+    }
+}
 
 module.exports = mongoose.model("User", userSchema)
