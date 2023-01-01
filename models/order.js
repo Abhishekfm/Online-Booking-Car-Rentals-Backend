@@ -25,6 +25,9 @@ const orderSchema = mongoose.Schema(
                 type:Date,
                 require:true
             }
+        },
+        numberOfCars:{
+            type:Number
         }
     }
 )

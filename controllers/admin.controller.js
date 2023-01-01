@@ -37,3 +37,70 @@ exports.createCar = async (req, res) => {
 
 }
 
+exports.addCarAtSameLocation = async (req, res) => {
+    try {
+        const { carId } = req.params
+        if(!carId){
+            throw new customError("Provide Detail", 401)
+        }
+        const carExist = await Car.findById(carId);
+        if(!carExist){
+            throw new customError("Wrong Details", 401)
+        }
+        carExist.numberOfCars += 1;
+        await carExist.save()
+        res.status(200).json({
+            success:true,
+            carExist
+        })
+    } catch (error) {
+        console.log(error);
+        throw new customError("Somethig went wrong", 401)
+    }
+}
+
+exports.decrementCarAtSameLocation = async (req, res) => {
+    try {
+        const { carId } = req.params
+        if(!carId){
+            throw new customError("Provide Detail", 401)
+        }
+        const carExist = await Car.findById(carId);
+        if(!carExist){
+            throw new customError("Wrong Details", 401)
+        }
+        if(carExist.numberOfCars < 1){
+            throw new customError("Cannot decrement", 401)
+        }
+        carExist.numberOfCars -= 1;
+        await carExist.save()
+        res.status(200).json({
+            success:true,
+            carExist
+        })
+    } catch (error) {
+        console.log(error);
+        throw new customError("Somethig went wrong", 401)
+    }
+}
+
+
+exports.deleteCar = async (req, res) => {
+    try {
+        const { carId } = req.params
+        if(!carId){
+            throw new customError("Provide Detail", 401)
+        }
+        const carExist = await Car.findByIdAndRemove(carId);
+        if(!carExist){
+            throw new customError("Wrong Details", 401)
+        }
+        res.status(200).json({
+            success:true,
+            carExist
+        })
+    } catch (error) {
+        console.log(error);
+        throw new customError("Somethig went wrong", 401)
+    }
+}

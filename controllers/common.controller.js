@@ -50,8 +50,8 @@ exports.bookCar = async (req, res) => {
             orderDate:{
                 startDate:startDate,
                 endDate:endDate
-            }
-
+            },
+            numberOfCars:1
         })
         res.status(200).json({
             success:true,
@@ -61,5 +61,23 @@ exports.bookCar = async (req, res) => {
     } catch (error) {
         console.log(error);
         throw new customError("Something Went Wrong",401)
+    }
+}
+
+
+exports.myOrder = async (req, res) => {
+    try {
+        const { user } = req
+        const userId = user._id
+        const allOrder = await Order.find({userId})
+        if(!allOrder){
+            throw new customError("You Have No Orders Yet", 401)
+        }
+        res.status(200).json({
+            success:true,
+            allOrder
+        })
+    } catch (error) {
+        throw new customError("Something went wrong", 401)
     }
 }
