@@ -8,7 +8,7 @@ exports.getAllCar = async (req, res) => {
         const { country, state, city, startDate, endDate } = req.body;
 
         if(!country || !state || !city || !startDate || !endDate){
-            throw customError("Provide All Details",401)
+            throw new customError("Provide All Details",401)
         }
 
         const allCar = await Car.find({'carLocation.country':`${country}`,'carLocation.state':`${state}`,'carLocation.city':`${city}`})
