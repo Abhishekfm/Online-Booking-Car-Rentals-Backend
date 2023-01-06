@@ -1,4 +1,5 @@
 const Car = require("../models/car")
+const Order = require("../models/order")
 const customError = require("../utils/custom.error")
 
 
@@ -115,5 +116,23 @@ exports.deleteCar = async (req, res) => {
     } catch (error) {
         console.log(error);
         throw new customError("Somethig went wrong", 401)
+    }
+}
+
+exports.showCarDb = async (req, res) => {
+    try {
+        const allCar = await Car.find().all()
+        res.send(allCar)
+    } catch (error) {
+        throw new customError("Something Went Wrong", 401)
+    }
+}
+
+exports.showOrderDb = async (req, res) => {
+    try {
+        const orders = await Order.find().all()
+        res.send(orders)
+    } catch (error) {
+        throw new customError("Something Went Wrong", 401)
     }
 }
