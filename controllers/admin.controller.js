@@ -5,7 +5,7 @@ const customError = require("../utils/custom.error")
 exports.createCar = async (req, res) => {
     try {
         const { user } = req
-        const { carName, carLocation, numberOfCars } = req.body
+        const { carName, carLocation, numberOfCars, url } = req.body
         if(!carName || !carLocation || !numberOfCars || numberOfCars < 0){
             throw new customError("Provide all Details")
         }
@@ -13,7 +13,10 @@ exports.createCar = async (req, res) => {
         const carExist = await Car.findOne({'carName':`${carName}`, 'carLocation.country':`${carLocation.country}`,'carLocation.state':`${carLocation.state}`,'carLocation.city':`${carLocation.city}`})
         console.log(carExist+"lplpl");
         if(carExist){
-            carExist.numberOfCars += numberOfCars
+            carExist.numberOfCars = Number(carExist.numberOfCars) + Number(numberOfCars)
+            if(url){
+                carExist.url = url;
+            }
             await carExist.save()
             res.status(200).json({
                 success:true,
@@ -21,11 +24,21 @@ exports.createCar = async (req, res) => {
             })
             return
         }
-        const car = await Car.create({
-            carName,
-            carLocation,
-            numberOfCars
-        })
+        let car;
+        if(url){
+            car = await Car.create({
+                carName,
+                carLocation,
+                numberOfCars,
+                url,
+            })
+        }else{
+            car = await Car.create({
+                carName,
+                carLocation,
+                numberOfCars
+            })
+        }
         res.status(200).json({
             success:true,
             car:car

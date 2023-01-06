@@ -18,7 +18,7 @@ exports.isAdminLoggedIn = async (req, res, next) => {
         if(req.user.role === AuthRoles.ADMIN){
             next()
         }else{
-            customError("You Are Not Admin to access this Page",401)
+            throw new customError("You Are Not Admin to access this Page",401)
         }
     } catch (error) {
         console.log(error);
