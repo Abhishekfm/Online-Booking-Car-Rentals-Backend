@@ -28,6 +28,20 @@ const orderSchema = mongoose.Schema(
         },
         numberOfCars:{
             type:Number
+        },
+        carLocation:{
+            country:{
+                type:String,
+                require:[true, "Location is required"]
+            },
+            state:{
+                type:String,
+                require:[true, "Location is required"]
+            },
+            city:{
+                type:String,
+                require:[true, "Location is required"]
+            }
         }
     }
 )

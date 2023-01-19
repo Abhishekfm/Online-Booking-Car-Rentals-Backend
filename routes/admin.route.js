@@ -1,4 +1,14 @@
-const { createCar, addCarAtSameLocation, decrementCarAtSameLocation, deleteCar, showCarDb, showOrderDb } = require("../controllers/admin.controller")
+const { createCar,
+    addCarAtSameLocation, 
+    decrementCarAtSameLocation, 
+    deleteCar, 
+    showCarDb, 
+    showOrderDb, 
+    getOrdersOfCar, 
+    getName, 
+    getTotalCars, 
+    getAllUsers, 
+    getOrdersById } = require("../controllers/admin.controller")
 const { isAdminLoggedIn } = require("../middleware/admin.auth")
 const express = require("express")
 
@@ -10,5 +20,10 @@ router.get("/decrementcaratsamelocation/:carId", isAdminLoggedIn, decrementCarAt
 router.delete("/deletecar/:carId", isAdminLoggedIn, deleteCar)
 router.post("/showcardb", isAdminLoggedIn, showCarDb)
 router.get("/showorderdb", isAdminLoggedIn, showOrderDb)
+router.get("/getordersofcar/:carId", isAdminLoggedIn, getOrdersOfCar)
+router.get("/getname/:id", isAdminLoggedIn, getName)
+router.get("/gettotalcars/:id", isAdminLoggedIn, getTotalCars)
+router.post("/getalluser", isAdminLoggedIn, getAllUsers)
+router.get("/getorderbyid/:userId", isAdminLoggedIn, getOrdersById)
 
 module.exports = router

@@ -25,6 +25,10 @@ const carSchema = mongoose.Schema(
         },
         url:{
             type:String
+        },
+        totalCars:{
+            type:Number,
+            default:0
         }
     }
 )
