@@ -1,5 +1,5 @@
 const { createUser, login, logout, getDashboard } = require("../controllers/user.controller")
-const { isLoggedIn } = require("../middleware/user.auth")
+const { isLoggedIn,isDashboardLoggedIn  } = require("../middleware/user.auth")
 const express = require("express")
 
 const router = express.Router()
@@ -8,6 +8,6 @@ const router = express.Router()
 router.post("/createuser",createUser)
 router.post("/login",login)
 router.get("/logout",logout)
-router.get("/dashboard", isLoggedIn, getDashboard)
+router.get("/dashboard",isDashboardLoggedIn, getDashboard)
 
 module.exports = router

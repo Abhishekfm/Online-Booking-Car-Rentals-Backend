@@ -8,7 +8,9 @@ const { createCar,
     getName, 
     getTotalCars, 
     getAllUsers, 
-    getOrdersById } = require("../controllers/admin.controller")
+    getOrdersById, 
+    deleteOrderById, 
+    deleteUserAccount } = require("../controllers/admin.controller")
 const { isAdminLoggedIn } = require("../middleware/admin.auth")
 const express = require("express")
 
@@ -25,5 +27,7 @@ router.get("/getname/:id", isAdminLoggedIn, getName)
 router.get("/gettotalcars/:id", isAdminLoggedIn, getTotalCars)
 router.post("/getalluser", isAdminLoggedIn, getAllUsers)
 router.get("/getorderbyid/:userId", isAdminLoggedIn, getOrdersById)
+router.delete("/deleteorderbyid/:carId/:orderId", isAdminLoggedIn, deleteOrderById)
+router.delete("/deleteuseraccount/:id/:role", isAdminLoggedIn, deleteUserAccount)
 
 module.exports = router

@@ -4,7 +4,6 @@ const cookieOptions = require("../utils/cookie.options")
 const AuthRoles = require("../utils/auth.roles")
 const checkIfAdmin = require("../utils/check.admin")
 
-
 exports.createUser = async (req, res) => {
     try {
         const {name, email, password} = req.body;
@@ -109,10 +108,13 @@ exports.logout = async (req, res) => {
 exports.getDashboard = (req, res) => {
     try {
         const { user } = req;
-        console.log(user);
-        console.log("I am inside getDashboard");
         if(!user || !user.name || !user.email || !user._id){
-            throw new customError("Not authorized to access this route", 401)
+            res.status(201).json({
+                success:true,
+                role:"NOROLE"
+            })
+            // throw new customError("Not authorized to access this route", 401)
+            return
         }
         res.status(201).json({
             success: true,

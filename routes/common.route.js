@@ -6,7 +6,7 @@ const express = require("express")
 
 const router = express.Router()
 
-router.post("/getallcar", isLoggedIn, getAllCar)
+router.post("/getallcar", getAllCar)
 router.post("/bookcar", isLoggedIn, bookCar)
 router.get("/myorder", isLoggedIn, myOrder)
 router.post("/bookcarwithenddate", isLoggedIn, bookCarWithEndDate)

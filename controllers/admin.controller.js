@@ -11,7 +11,7 @@ exports.createCar = async (req, res) => {
         if(!carName || !carLocation || !numberOfCars || numberOfCars < 0){
             throw new customError("Provide all Details")
         }
-
+        console.log(url);
         const carExist = await Car.findOne({'carName':`${carName}`, 'carLocation.country':`${carLocation.country}`,'carLocation.state':`${carLocation.state}`,'carLocation.city':`${carLocation.city}`})
         console.log(carExist+"lplpl");
         if(carExist){
@@ -252,5 +252,107 @@ exports.getOrdersById = async (req, res) => {
         })
     } catch (error) {
         throw new customError("Something went wrong", 401)
+    }
+}
+
+exports.deleteOrderById = async (req, res) => {
+    try {
+        const { carId, orderId } = req.params
+        if(!carId || !orderId){
+            throw new customError("Provide All Information", 401)
+        }
+        const thisOrder = await Order.findByIdAndRemove(orderId)
+        if(!thisOrder){
+            console.log(thisOrder);
+            throw new customError("This Order Not Exist", 401)
+        }
+        const car = await Car.findById(carId)
+        if(!car){
+            const carExist = await Car.findOne({'carName':`${thisOrder.carName}`, 'carLocation.country':`${thisOrder.carLocation.country}`,'carLocation.state':`${thisOrder.carLocation.state}`,'carLocation.city':`${thisOrder.carLocation.city}`})
+            if(carExist){
+                carExist.numberOfCars += 1
+                carExist.save()
+                res.status(200).json({
+                    success:true,
+                    carExist,
+                    thisOrder
+                })
+                return
+            }
+            const createCar = await Car.create({
+                carName: thisOrder.carName,
+                carLocation:thisOrder.carLocation,
+                numberOfCars:1,
+                url:"",
+                totalCars:1
+            })
+            res.status(200).json({
+                success:true,
+                createCar,
+                thisOrder
+            })
+            return
+        }
+        car.numberOfCars += 1
+        await car.save()
+        res.status(200).json({
+            success:true,
+            car, 
+            thisOrder
+        })
+    } catch (error) {
+        console.log(error);
+        throw new customError("Something went wrong", 401)
+    }
+}
+
+exports.deleteUserAccount = async (req, res) => {
+    try {
+        const { id, role } = req.params
+        if(!id || role === "ADMIN"){
+            return
+        }
+        const ordersOfUser = await Order.find({userId:id})
+        ordersOfUser.forEach(async (ele)=>{
+            let res = await Car.findById(ele.carId)
+            if(!res){
+                const carExist = await Car.findOne({'carName':`${ele.carName}`, 'carLocation.country':`${ele.carLocation.country}`,'carLocation.state':`${ele.carLocation.state}`,'carLocation.city':`${ele.carLocation.city}`})
+                if(carExist){
+                    carExist.numberOfCars += Number(ele.numberOfCars)
+                    await carExist.save()
+                    return
+                }else{
+                    const createCar = await Car.create({
+                        carName: ele.carName,
+                        carLocation:ele.carLocation,
+                        numberOfCars:ele.numberOfCars,
+                        url:"",
+                        totalCars:ele.numberOfCars
+                    })
+                }
+                return
+            }
+            res.numberOfCars += 1
+            await res.save()
+        })
+        const orderOfUserDelete = await Order.deleteMany({userId:id})
+        const userDelete = await Customer.findByIdAndRemove(id)
+        if(!orderOfUserDelete || !userDelete){
+            res.status(200).json({
+                success:true,
+                orderOfUserDelete,
+                userDelete,
+                ordersOfUser
+            })
+            return
+        }
+        res.status(200).json({
+            success:true,
+            orderOfUserDelete,
+            userDelete,
+            ordersOfUser
+        })
+    } catch (error) {
+        console.log(error);
     }
 }
