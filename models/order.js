@@ -42,6 +42,19 @@ const orderSchema = mongoose.Schema(
                 type:String,
                 require:[true, "Location is required"]
             }
+        },
+        stage:{
+            type:String,
+            default:"PENDING"
+        },
+        code:{
+            otp:{
+                type:String,
+                default:""
+            },
+            expiresAt:{
+                type:Date
+            }
         }
     }
 )

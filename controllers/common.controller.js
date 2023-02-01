@@ -1,5 +1,7 @@
-const Car = require("../models/car")
+const Car = require("../models/car");
+const Customer = require("../models/customer");
 const Order = require("../models/order")
+const emailService = require('../utils/email.service');
 const customError = require("../utils/custom.error")
 
 
@@ -201,3 +203,31 @@ exports.deleteOrder = async (req, res) => {
         throw new customError("Something went wrong", 401)
     }
 }
+
+exports.sendOtp = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const order = await Order.findById(orderId);
+        if (!order) {
+          return res.status(400).send({ message: "Order not found" });
+        }
+      
+        const customer = await Customer.findById(order.userId);
+        const { email } = customer;
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresIn = 5 * 60 * 1000;
+        const expiresAt = new Date(Date.now() + expiresIn);
+      
+        order.code = { otp, expiresAt };
+        await order.save();
+      
+        const emailResponse = await emailService.sendOtp(email, otp);
+        return res.status(200).send({ message: "OTP sent successfully" });
+    } catch (error) {
+        return res.status(400).json({
+          message: error.message,
+          error:error
+        })
+    }
+};
+  
