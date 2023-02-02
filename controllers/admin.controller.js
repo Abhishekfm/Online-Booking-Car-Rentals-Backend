@@ -151,8 +151,29 @@ exports.showCarDb = async (req, res) => {
 
 exports.showOrderDb = async (req, res) => {
     try {
-        const orders = await Order.find().all()
-        res.send(orders)
+        let { skipNo } = req.body
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const currentDate = tomorrow.toISOString().substr(0, 16);
+        const result = await Order.deleteMany({
+            $and: [
+                { "orderDate.endDate": { $lt: currentDate } },
+                { stage: "PENDING" }
+            ]
+        });
+        console.log(skipNo);
+        if(!skipNo){
+            skipNo = 0
+        }
+        skipNo = skipNo * 5
+        const allOrder = await Order.find({});
+        const allFiveOrder = await Order.find().sort({$natural:-1}).skip(skipNo).limit(5)
+        res.status(200).json({
+            success:true,
+            length:allFiveOrder.length,
+            totalLength:allOrder.length,
+            allFiveOrder
+        })
     } catch (error) {
         throw new customError("Something Went Wrong", 401)
     }
