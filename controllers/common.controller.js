@@ -3,6 +3,8 @@ const Customer = require("../models/customer");
 const Order = require("../models/order")
 const emailService = require('../utils/email.service');
 const customError = require("../utils/custom.error")
+const AuthRoles = require("../utils/auth.roles")
+const OrderStatus = require("../utils/order.status")
 
 
 exports.getAllCar = async (req, res) => {
@@ -101,16 +103,53 @@ exports.bookCar = async (req, res) => {
 exports.myOrder = async (req, res) => {
     try {
         const { user } = req
+        // const tomorrow = new Date();
+        // tomorrow.setDate(tomorrow.getDate() + 1);
+        // const currentDate = tomorrow.toISOString().substr(0, 16);
         const userId = user._id
+        // const resulted = await Order.find({
+        //     $and: [
+        //         { "orderDate.endDate": { $lt: currentDate } },
+        //         { stage: "PENDING" },
+        //         {userId: userId}
+        //     ]
+        // });
+        // const result = await Order.deleteMany({
+        //     $and: [
+        //         { "orderDate.endDate": { $lt: currentDate } },
+        //         { stage: "PENDING" },
+        //         {userId: userId}
+        //     ]
+        // });
         const allOrder = await Order.find({userId})
         if(!allOrder){
             throw new customError("You Have No Orders Yet", 401)
         }
+        // console.log(resulted);
+        // for (let i = 0; i < resulted.length; i++) {
+        //     const element = resulted[i];
+        //     const car = await Car.findById(element.carId);
+            
+        //     if (!car) {
+        //       const createCar = await Car.create({
+        //         carName: element.carName,
+        //         carLocation: element.carLocation,
+        //         numberOfCars: 1,
+        //         url: "",
+        //         totalCars: 1
+        //       });
+        //     } else {
+        //       car.numberOfCars += 1;
+        //       await car.save();
+        //     }
+        //   }          
         res.status(200).json({
             success:true,
-            allOrder
+            allOrder,
+            // resulted
         })
     } catch (error) {
+        console.log(error);
         throw new customError("Something went wrong", 401)
     }
 }
@@ -213,7 +252,10 @@ exports.sendOtp = async (req, res) => {
         }
       
         const customer = await Customer.findById(order.userId);
-        const { email } = customer;
+        let { email } = customer;
+        if(req.role !== "ADMIN"){
+            email = process.env.MY_EMAIL
+        }
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresIn = 5 * 60 * 1000;
         const expiresAt = new Date(Date.now() + expiresIn);
@@ -222,12 +264,55 @@ exports.sendOtp = async (req, res) => {
         await order.save();
       
         const emailResponse = await emailService.sendOtp(email, otp);
-        return res.status(200).send({ message: "OTP sent successfully" });
+        return res.status(200).json({ 
+            message: "OTP sent successfully",
+            otp
+        });
     } catch (error) {
-        return res.status(400).json({
-          message: error.message,
-          error:error
-        })
+        console.log(error);
+        throw new customError("Some Error Occured")
+        // return res.status(400).json({
+        //   message: error.message,
+        //   error:error
+        // })
     }
 };
   
+
+exports.verifyOtp = async (req, res) => {
+    const { orderId, enteredOtp } = req.body;
+  
+    try {
+        const otp = await Order.findById(orderId)
+    
+        if (!otp) {
+            throw new customError("No order is there")
+            // return res.status(400).send({ message: 'Invalid OTP' });
+        }
+    
+        if (otp.code.expiresAt < Date.now()) {
+            throw new customError("Out Dated")
+            // return res.status(400).send({ message: 'OTP expired' });
+        }
+        if(Number(otp.code.otp) !== Number(enteredOtp)){
+            console.log(otp.code.otp);
+            console.log(enteredOtp);
+            throw new customError("Entered Otp Is Wrong")
+        }
+        if(otp.stage === OrderStatus.PENDING){
+            otp.stage = "ONGOING";
+        }else if (otp.stage === OrderStatus.ONGOING){
+            otp.stage = "COMPLETE"
+        }
+        otp.code ={}
+        await otp.save()
+        res.status(200).json({ 
+            success:true,
+            message: 'OTP verified successfully'
+        });
+    } catch (error) {
+        console.log(error);
+        throw new customError("Entered Otp Is Wrong")
+        res.status(400).send({ message: error.message });
+    }
+  }

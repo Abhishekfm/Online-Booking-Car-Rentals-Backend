@@ -152,15 +152,15 @@ exports.showCarDb = async (req, res) => {
 exports.showOrderDb = async (req, res) => {
     try {
         let { skipNo } = req.body
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const currentDate = tomorrow.toISOString().substr(0, 16);
-        const result = await Order.deleteMany({
-            $and: [
-                { "orderDate.endDate": { $lt: currentDate } },
-                { stage: "PENDING" }
-            ]
-        });
+        // const tomorrow = new Date();
+        // tomorrow.setDate(tomorrow.getDate() + 1);
+        // const currentDate = tomorrow.toISOString().substr(0, 16);
+        // const result = await Order.deleteMany({
+        //     $and: [
+        //         { "orderDate.endDate": { $lt: currentDate } },
+        //         { stage: "PENDING" }
+        //     ]
+        // });
         console.log(skipNo);
         if(!skipNo){
             skipNo = 0
@@ -175,6 +175,7 @@ exports.showOrderDb = async (req, res) => {
             allFiveOrder
         })
     } catch (error) {
+        console.log(error);
         throw new customError("Something Went Wrong", 401)
     }
 }

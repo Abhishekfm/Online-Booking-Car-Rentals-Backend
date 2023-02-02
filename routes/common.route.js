@@ -1,4 +1,4 @@
-const { getAllCar, bookCar, myOrder, bookCarWithEndDate, deleteOrder, sendOtp } = require("../controllers/common.controller")
+const { getAllCar, bookCar, myOrder, bookCarWithEndDate, deleteOrder, sendOtp, verifyOtp } = require("../controllers/common.controller")
 
 const { isLoggedIn } = require("../middleware/user.auth")
 
@@ -12,5 +12,6 @@ router.get("/myorder", isLoggedIn, myOrder)
 router.post("/bookcarwithenddate", isLoggedIn, bookCarWithEndDate)
 router.delete("/deleteorder/:carId/:orderId", isLoggedIn, deleteOrder)
 router.get("/sendotp/:orderId", isLoggedIn, sendOtp)
+router.post("/verifyotp", isLoggedIn, verifyOtp)
 
 module.exports = router
