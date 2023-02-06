@@ -55,6 +55,17 @@ const orderSchema = mongoose.Schema(
             expiresAt:{
                 type:Date
             }
+        },
+        price:{
+            type:Number,
+            require:true,
+            default:1050
+        },
+        address:{
+            type:String,
+            default: function () {
+                return `${this.carLocation.country}, ${this.carLocation.state}, ${this.carLocation.city}`;
+            }
         }
     }
 )

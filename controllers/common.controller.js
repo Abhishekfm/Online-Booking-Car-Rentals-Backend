@@ -36,7 +36,7 @@ exports.getAllCar = async (req, res) => {
 
 exports.bookCar = async (req, res) => {
     try {
-        const { carId, startDate, endDate}= req.body
+        const { carId, startDate, endDate, price, address}= req.body
         if(!carId || !startDate || !endDate){
             throw new customError("Provide all details", 401)
         }
@@ -86,7 +86,9 @@ exports.bookCar = async (req, res) => {
                 startDate:startDate,
                 endDate:endDate
             },
+            price:price,
             numberOfCars:1,
+            address:address,
             carLocation:carExist.carLocation
         })
         res.status(200).json({
@@ -253,7 +255,7 @@ exports.sendOtp = async (req, res) => {
       
         const customer = await Customer.findById(order.userId);
         let { email } = customer;
-        if(req.role !== "ADMIN"){
+        if(req.user.role !== AuthRoles.ADMIN){
             email = process.env.MY_EMAIL
         }
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -302,6 +304,37 @@ exports.verifyOtp = async (req, res) => {
         if(otp.stage === OrderStatus.PENDING){
             otp.stage = "ONGOING";
         }else if (otp.stage === OrderStatus.ONGOING){
+            const element = otp;
+            const car = await Car.findById(element.carId);
+            
+            if (!car) {
+                const sameLocation = await Car.findOne({
+                    $and:[
+                        {"carLocation.country":element.carLocation.country},
+                        {"carLocation.state":element.carLocation.state},
+                        {"carLocation.city":element.carLocation.city},
+                        {"carName":element.carName}
+                    ]
+                })
+                if(sameLocation){
+                    sameLocation.numberOfCars += 1
+                    if(sameLocation.numberOfCars > sameLocation.totalCars){
+                        sameLocation.totalCars = sameLocation.numberOfCars
+                    }
+                    await sameLocation.save()
+                }else{
+                    const createCar = await Car.create({
+                        carName: element.carName,
+                        carLocation: element.carLocation,
+                        numberOfCars: 1,
+                        url: "",
+                        totalCars: 1
+                      });
+                }
+            } else {
+              car.numberOfCars += 1;
+              await car.save();
+            }
             otp.stage = "COMPLETE"
         }
         otp.code ={}
