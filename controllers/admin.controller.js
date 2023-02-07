@@ -70,6 +70,9 @@ exports.addCarAtSameLocation = async (req, res) => {
         }
         carExist.numberOfCars += 1;
         carExist.totalCars += 1;
+        if(carExist.numberOfCars>carExist.totalCars){
+            carExist.totalCars = carExist.numberOfCars
+        }
         await carExist.save()
         res.status(200).json({
             success:true,
@@ -263,16 +266,24 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getOrdersById = async (req, res) => {
     try {
-        const { userId } = req.params
-        const allOrder = await Order.find({userId})
+        let { userId, skipNo2 } = req.params
+        if(!skipNo2){
+            skipNo2 = 0
+        }
+        skipNo2 = skipNo2 * 5
+        const allOrder = await Order.find({userId});
+        const allFiveOrder = await Order.find({userId}).sort({$natural:-1}).skip(skipNo2).limit(5)
         if(!allOrder){
             throw new customError("You Have No Orders Yet", 401)
         }
         res.status(200).json({
             success:true,
-            allOrder
+            length:allFiveOrder.length,
+            totalLength:allOrder.length,
+            allFiveOrder
         })
     } catch (error) {
+        console.log(error)
         throw new customError("Something went wrong", 401)
     }
 }
@@ -293,6 +304,9 @@ exports.deleteOrderById = async (req, res) => {
             const carExist = await Car.findOne({'carName':`${thisOrder.carName}`, 'carLocation.country':`${thisOrder.carLocation.country}`,'carLocation.state':`${thisOrder.carLocation.state}`,'carLocation.city':`${thisOrder.carLocation.city}`})
             if(carExist){
                 carExist.numberOfCars += 1
+                if(carExist.numberOfCars > carExist.totalCars){
+                    carExist.totalCars = carExist.numberOfCars
+                }
                 carExist.save()
                 res.status(200).json({
                     success:true,

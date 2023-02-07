@@ -8,10 +8,10 @@ const router = express.Router()
 
 router.post("/getallcar", getAllCar)
 router.post("/bookcar", isLoggedIn, bookCar)
-router.get("/myorder", isLoggedIn, myOrder)
+router.get("/myorder/:skipNo2", isLoggedIn, myOrder)
 router.post("/bookcarwithenddate", isLoggedIn, bookCarWithEndDate)
 router.delete("/deleteorder/:carId/:orderId", isLoggedIn, deleteOrder)
-router.get("/sendotp/:orderId", isLoggedIn, sendOtp)
+router.get("/sendotp/:orderId/:sbjct/:msg", isLoggedIn, sendOtp)
 router.post("/verifyotp", isLoggedIn, verifyOtp)
 
 module.exports = router

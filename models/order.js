@@ -66,7 +66,13 @@ const orderSchema = mongoose.Schema(
             default: function () {
                 return `${this.carLocation.country}, ${this.carLocation.state}, ${this.carLocation.city}`;
             }
+        },
+        url:{
+            type:String,
+            default:"EMPTY"
         }
+    },{
+        timestamps: true
     }
 )
 

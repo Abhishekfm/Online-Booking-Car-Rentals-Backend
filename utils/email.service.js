@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-exports.sendOtp = async (email, code) => {
+exports.sendOtp = async (email, code, sbjct, msg) => {
   console.log(email);
   console.log(code);
   console.log(`env Email ${process.env.MY_EMAIL}`);
@@ -16,7 +16,7 @@ exports.sendOtp = async (email, code) => {
   const mailOptions = {
     from: `"My Rental"<process.env.MY_EMAIL>`,
     to: email,
-    subject: 'OTP for Booking',
+    subject: `${sbjct}`,
     html:`<html>
     <head>
       <style>
@@ -45,7 +45,7 @@ exports.sendOtp = async (email, code) => {
       <div class="container">
         <div class="title">OTP Verification</div>
         <div class="otp">${code}</div>
-        <div class="message">This is your one-time password. Give This OTP to our Dilvery Agent. When you recieve your Booked Car.</div>
+        <div class="message">${msg}</div>
       </div>
     </body>
   </html>

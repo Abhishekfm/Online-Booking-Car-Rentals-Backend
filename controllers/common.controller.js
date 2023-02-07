@@ -9,13 +9,18 @@ const OrderStatus = require("../utils/order.status")
 
 exports.getAllCar = async (req, res) => {
     try {
-        const { country, state, city, startDate, endDate } = req.body;
+        const { country, state, city, startDate, endDate} = req.body;
+        let { skipNo2 } = req.body
 
         if(!country || !state || !city || !startDate || !endDate){
             throw new customError("Provide All Details",401)
         }
-
+        if(!skipNo2){
+            skipNo2 = 0
+        }
+        skipNo2 = skipNo2 * 5
         const allCar = await Car.find({'carLocation.country':`${country}`,'carLocation.state':`${state}`,'carLocation.city':`${city}`,'numberOfCars':{$gt:0}})
+        const allFiveCar = await Car.find({'carLocation.country':`${country}`,'carLocation.state':`${state}`,'carLocation.city':`${city}`,'numberOfCars':{$gt:0}}).sort({$natural:-1}).skip(skipNo2).limit(5)
         if(!allCar){
             res.status(200).json({
                 success:false,
@@ -25,7 +30,9 @@ exports.getAllCar = async (req, res) => {
         }
         res.status(200).json({
             success:true,
-            allCar
+            length:allFiveCar.length,
+            totalLength:allCar.length,
+            allFiveCar
         })
     } catch (error) {
         console.log(error);
@@ -36,7 +43,7 @@ exports.getAllCar = async (req, res) => {
 
 exports.bookCar = async (req, res) => {
     try {
-        const { carId, startDate, endDate, price, address}= req.body
+        const { carId, startDate, endDate, price, address, url}= req.body
         if(!carId || !startDate || !endDate){
             throw new customError("Provide all details", 401)
         }
@@ -73,10 +80,10 @@ exports.bookCar = async (req, res) => {
             // })
             return
         }
-        carExist.numberOfCars -= 1;
         if(!req.user){
             throw new customError("You are not Logged In", 401)
         }
+        carExist.numberOfCars -= 1;
         await carExist.save()
         const createOrder = await Order.create({
             carName: carExist.carName,
@@ -89,7 +96,8 @@ exports.bookCar = async (req, res) => {
             price:price,
             numberOfCars:1,
             address:address,
-            carLocation:carExist.carLocation
+            carLocation:carExist.carLocation,
+            url
         })
         res.status(200).json({
             success:true,
@@ -105,6 +113,7 @@ exports.bookCar = async (req, res) => {
 exports.myOrder = async (req, res) => {
     try {
         const { user } = req
+        let { skipNo2 } = req.params
         // const tomorrow = new Date();
         // tomorrow.setDate(tomorrow.getDate() + 1);
         // const currentDate = tomorrow.toISOString().substr(0, 16);
@@ -123,7 +132,12 @@ exports.myOrder = async (req, res) => {
         //         {userId: userId}
         //     ]
         // });
-        const allOrder = await Order.find({userId})
+        if(!skipNo2){
+            skipNo2 = 0
+        }
+        skipNo2 = skipNo2 * 5
+        const allOrder = await Order.find({userId});
+        const allFiveOrder = await Order.find({userId}).sort({$natural:-1}).skip(skipNo2).limit(5)
         if(!allOrder){
             throw new customError("You Have No Orders Yet", 401)
         }
@@ -147,8 +161,9 @@ exports.myOrder = async (req, res) => {
         //   }          
         res.status(200).json({
             success:true,
-            allOrder,
-            // resulted
+            length:allFiveOrder.length,
+            totalLength:allOrder.length,
+            allFiveOrder
         })
     } catch (error) {
         console.log(error);
@@ -247,7 +262,7 @@ exports.deleteOrder = async (req, res) => {
 
 exports.sendOtp = async (req, res) => {
     try {
-        const { orderId } = req.params;
+        const { orderId, sbjct, msg } = req.params;
         const order = await Order.findById(orderId);
         if (!order) {
           return res.status(400).send({ message: "Order not found" });
@@ -265,7 +280,7 @@ exports.sendOtp = async (req, res) => {
         order.code = { otp, expiresAt };
         await order.save();
       
-        const emailResponse = await emailService.sendOtp(email, otp);
+        const emailResponse = await emailService.sendOtp(email, otp, sbjct, msg);
         return res.status(200).json({ 
             message: "OTP sent successfully",
             otp
