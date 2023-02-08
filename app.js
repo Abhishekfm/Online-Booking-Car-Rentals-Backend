@@ -16,7 +16,7 @@ app.use(express.urlencoded({
 }))
 
 const corsOptions ={
-    origin:"http://localhost:3000", 
+    origin:"https://online-booking-car-rentals-frontend.vercel.app", 
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200,
     allowedHeaders:['Content-Type', 'Authorization']
