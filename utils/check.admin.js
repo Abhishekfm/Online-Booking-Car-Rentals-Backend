@@ -1,5 +1,5 @@
 const checkIfAdmin = (email)=>{
-    if(email === "abhishek@admin.com"){
+    if(email === process.env.ADMIN_MAIL){
         return true
     }
     return false
