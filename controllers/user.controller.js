@@ -112,7 +112,7 @@ exports.getDashboard = (req, res) => {
             res.status(201).json({
                 success:true,
                 role:"NOROLE",
-                user
+                user:user
             })
             // throw new customError("Not authorized to access this route", 401)
             return
