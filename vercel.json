@@ -1,0 +1,6 @@
+{
+    "version": 2,
+    "name": "todo_full_stack_app-server",
+    "builds": [{ "src": "index.js", "use": "@vercel/node" }],
+    "routes": [{ "src": "/(.*)", "dest": "/index.js" }]
+  }
