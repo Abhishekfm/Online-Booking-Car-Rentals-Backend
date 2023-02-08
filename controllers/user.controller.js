@@ -86,16 +86,16 @@ exports.logout = async (req, res) => {
     try {
         res.cookie("token", null, {
             expires: new Date(Date.now()),
-            httpOnly: true
-            // sameSite :'None',
-            // secure : true
+            httpOnly: true,
+            sameSite :'None',
+            secure : true
         })
-        // res.clearCookie("token",{
-        //     expires: new Date(Date.now()),
-        //     httpOnly: true,
-        //     sameSite :'None',
-        //     secure : true
-        // })
+        res.clearCookie("token",{
+            expires: new Date(Date.now()),
+            httpOnly: true,
+            sameSite :'None',
+            secure : true
+        })
         res.status(200).json({
             success: true,
             message: "Logged Out"
@@ -111,7 +111,8 @@ exports.getDashboard = (req, res) => {
         if(!user || !user.name || !user.email || !user._id){
             res.status(201).json({
                 success:true,
-                role:"NOROLE"
+                role:"NOROLE",
+                user
             })
             // throw new customError("Not authorized to access this route", 401)
             return
