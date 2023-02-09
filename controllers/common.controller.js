@@ -268,7 +268,7 @@ exports.sendOtp = async (req, res) => {
           return res.status(400).send({ message: "Order not found" });
         }
         const now = new Date();
-        if (order.orderDate.endDate.getTime() < now.getTime()) {
+        if (order.orderDate.endDate.getTime() < now.getTime() && sbjct === "Delivery Of the Vehicle") {
             console.log("The end date is earlier than the current date.");
             res.status(200).json({ 
               message: "OTP Doenst Allow",
