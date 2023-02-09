@@ -267,7 +267,16 @@ exports.sendOtp = async (req, res) => {
         if (!order) {
           return res.status(400).send({ message: "Order not found" });
         }
-      
+        const now = new Date();
+        if (order.orderDate.endDate.getTime() < now.getTime()) {
+            console.log("The end date is earlier than the current date.");
+            res.status(400).json({ 
+              message: "OTP sent successfully",
+              now,
+              endDate:order.orderDate.endDate
+            });
+            return
+        }
         const customer = await Customer.findById(order.userId);
         let { email } = customer;
         if(req.user.role !== AuthRoles.ADMIN){
