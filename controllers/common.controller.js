@@ -78,6 +78,11 @@ exports.bookCar = async (req, res) => {
             //     createOrder,
             //     carOrder
             // })
+            if(!carExist){
+                throw new customError("This car is not exist",401)
+                return
+            }
+            throw new customError("Car is not available",401)
             return
         }
         if(!req.user){
