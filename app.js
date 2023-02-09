@@ -25,17 +25,6 @@ const corsOptions ={
 app.use(cookieParser())
 
 app.use(cors(corsOptions))
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://online-booking-car-rentals-frontend.vercel.app");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-  //Note: The value of the "Access-Control-Allow-Origin" header should be set to the origin that is allowed to access the resource. You can also set it to "*" to allow access from any domain, but this is not recommended for security reasons.
-  
-  
-  
-  
-  
 
 connectToDb()
 
