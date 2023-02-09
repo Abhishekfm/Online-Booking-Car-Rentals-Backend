@@ -90,6 +90,8 @@ exports.logout = async (req, res) => {
             sameSite :'None',
             secure : true
         })
+        sessionStorage.clear()
+        sessionStorage.removeItem("token");
         res.clearCookie("token",{
             expires: new Date(Date.now()),
             httpOnly: true,
