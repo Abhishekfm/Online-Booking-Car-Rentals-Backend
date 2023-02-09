@@ -7,7 +7,7 @@ const router = express.Router()
 
 router.post("/createuser",createUser)
 router.post("/login",login)
-router.get("/logout",logout)
+router.post("/logout",logout)
 router.get("/dashboard",isLoggedIn, getDashboard)
 
 module.exports = router
